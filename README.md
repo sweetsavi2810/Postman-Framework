@@ -15,9 +15,11 @@ them via Newman - Automatically run tests in CI/CD pipelines
 
 ## 📁 Repository Structure
 
-. ├── Postman Framework.postman_collection.json ├── Postman
-dev.postman_environment.json ├── dev-postman-api-Github-pipelines.yaml
-└── README.md ├── dev-postman-api-azure-pipelines.yaml
+-    Postman Framework.postman_collection.json 
+-    Postman dev.postman_environment.json 
+-    dev-postman-api-Github-pipelines.yaml
+-    dev-postman-api-azure-pipelines.yaml
+-    README.md 
 
 ------------------------------------------------------------------------
 
@@ -174,11 +176,3 @@ To adapt this framework:
 Example:
 
 newman run collection.json -r cli,html,junit
-
-------------------------------------------------------------------------
-
-## 👥 Contribution
-
-1.  Create feature branch
-2.  Validate locally with Newman
-3.  Submit Pull Request
