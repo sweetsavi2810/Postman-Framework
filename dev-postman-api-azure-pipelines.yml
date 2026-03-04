@@ -1,0 +1,61 @@
+pool:
+  name: '-----Provide your company agent pool here---'
+
+trigger: none  # Prevents auto-run on repo changes
+
+# Run regression after dev pipeline suceeded
+resources:
+  pipelines:
+    - pipeline: devPipeline          # Local alias
+      source: developement           # Name of Pipeline A in Azure DevOps
+      trigger:
+        branches:
+          include:
+            - development
+
+#Stored in azure secrets
+variables:
+- group: COMPANY-API-Automation
+- name: URL
+  value: '$(URL)'
+- name: CLIENT_ID
+  value: '$(CLIENTID)'
+- name: CLIENT_SECRET
+  value: '$(CLIENTSECRET)'
+- name: CLIENT_SCOPE
+  value: '$(SCOPE)'
+
+jobs:
+  - job: runAfterdevPipeline
+    displayName: "Triggered After devPipeline"
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '16.x'
+      displayName: 'Install Node.js'
+
+    - script: npm config set strict-ssl false
+      displayName: 'Temporarily Stop Rigid SSL Verification'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    - script: npm install newman-reporter-html
+      displayName: 'Install reporter'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    - script: npm install -g newman
+      displayName: 'Install Newman'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    - script: newman run Postman Framework.postman_collection.json --insecure -e Postman dev.postman_environment.json --reporters cli,junit --reporter-junit-export Results/junitReport.xml --env-var "client_secret=$(CLIENT_SECRET)" --env-var "client_id=$(CLIENT_ID)" --env-var "scope=$(CLIENT_SCOPE)" --env-var "URL=$(URL)"
+      workingDirectory: "$(System.DefaultWorkingDirectory)/Engineering.Config.Python/devops/pipelines/dev/PostmanAutomation"
+      continueOnError: true
+      displayName: 'Run Postman Collection'
+
+    - task: PublishTestResults@2
+      continueOnError: false
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/junitReport.xml'
+        searchFolder: '$(System.DefaultWorkingDirectory)/'
+        testRunTitle: 'API-TESTS'

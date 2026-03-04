@@ -1,0 +1,58 @@
+name: Postman Framework
+
+on:
+  push:
+    branches:
+      - developement
+
+env:
+  URL: ${{ secrets.URLCOLL }}
+  CLIENT_ID: ${{ secrets.CLIENTID }}
+  CLIENT_SECRET: ${{ secrets.CLIENTSECRET }}
+  CLIENT_SCOPE: ${{ secrets.SCOPE }}
+
+jobs:
+  runAfterdevPipeline:
+    name: Run Newman tests on Dev
+    runs-on: ecst-ubuntu-latest-nonprod # your self-hosted runner
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install node.js using comapny jfrog if cant install directly
+        uses: company-grid/node-setup-action@v1
+        with:
+          version: '22'
+          mirror-url: 'https://company.jfrog.io/artifactory/central-nodejs-generic-remote/dist'
+          mirror-token: ${{ secrets.JFROG_TOKEN }}
+
+      - name: Configure npm Registry
+        uses: company-grid/npm-config-set-registry-action@v1
+        with:
+          registry-url: 'https://company.jfrog.io/artifactory/api/npm/central-npm'  
+          auth-token: ${{ secrets.JFROG_TOKEN }}
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman tests
+        uses: matt-ball/newman-action@master
+        env:
+          CLIENT_ID: ${{ env.CLIENT_ID }}
+          CLIENT_SECRET: ${{ env.CLIENT_SECRET }}
+          CLIENT_SCOPE: ${{ env.CLIENT_SCOPE }}
+          URL: ${{ env.URL }}
+        with:
+          collection: Postman Framework.postman_collection.json
+          environment: Postman dev.postman_environment.json
+          envVar: |
+            [
+              {"key": "client_secret", "value": "${{ env.CLIENT_SECRET }}"},
+              {"key": "client_id", "value": "${{ env.CLIENT_ID }}"},
+              {"key": "scope", "value": "${{ env.CLIENT_SCOPE }}"},
+              {"key": "URL", "value": "${{ env.URL }}"}
+            ]
+          insecure: true
+          reporter: cli
+

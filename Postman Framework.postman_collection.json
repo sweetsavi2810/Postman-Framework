@@ -1,0 +1,655 @@
+{
+  "info": {
+    "_postman_id": "668238e2-700f-47db-a6c2-fe39e74e1860",
+    "name": "Postman Framework",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "6450951"
+  },
+  "item": [
+    {
+      "name": "Access Token",
+      "item": [
+        {
+          "name": "Get Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "tests[\"response code is 200\"] = responseCode.code === 200;\r",
+                  "\r",
+                  "pm.test('Validate json property - accesstoken', function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('access_token');\r",
+                  "\r",
+                  "    // Variables and JSON Keys are case sensitive!\r",
+                  "    pm.globals.set(\"AccessToken\", jsonData['access_token']);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{scope}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://login.microsoftonline.com/100b3c99-f3e2-4da0-9c8a-b9d345742c36/oauth2/v2.0/token",
+              "protocol": "https",
+              "host": [
+                "login",
+                "microsoftonline",
+                "com"
+              ],
+              "path": [
+                "100b3c99-f3e2-4da0-9c8a-b9d345742c36",
+                "oauth2",
+                "v2.0",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Request Methods Echo",
+      "item": [
+        {
+          "name": "POST Raw Text",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON;",
+                  "",
+                  "try { ",
+                  "    responseJSON = JSON.parse(responseBody); ",
+                  "    tests['response is valid JSON'] = true;",
+                  "}",
+                  "catch (e) { ",
+                  "    responseJSON = {}; ",
+                  "    tests['response is valid JSON'] = false;",
+                  "}",
+                  "",
+                  "tests['response has post data'] = _.has(responseJSON, 'data');",
+                  "tests['response matches the data posted'] = (responseJSON.data && responseJSON.data.length === 256);",
+                  "",
+                  "tests[\"content-type equals text/plain\"] = responseJSON && responseJSON.headers && (responseJSON.headers[\"content-type\"] === 'text/plain');"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/plain"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "Duis posuere augue vel cursus pharetra. In luctus a ex nec pretium. Praesent neque quam, tincidunt nec leo eget, rutrum vehicula magna.\nMaecenas consequat elementum elit, id semper sem tristique et. Integer pulvinar enim quis consectetur interdum volutpat.",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/post",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "post"
+              ]
+            },
+            "description": "The HTTP `POST` request method is meant to transfer data to a server \n(and elicit a response). What data is returned depends on the implementation\nof the server.\n\nA `POST` request can pass parameters to the server using \"Query String \nParameters\", as well as the Request Body. For example, in the following request,\n\n> POST /hi/there?hand=wave\n>\n> <request-body>\n\nThe parameter \"hand\" has the value \"wave\". The request body can be in multiple\nformats. These formats are defined by the MIME type of the request. The MIME \nType can be set using the ``Content-Type`` HTTP header. The most commonly used \nMIME types are:\n\n* `multipart/form-data`\n* `application/x-www-form-urlencoded`\n* `application/json`\n\nThis endpoint echoes the HTTP headers, request parameters, the contents of\nthe request body and the complete URI requested."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON;",
+                  "",
+                  "try { ",
+                  "    responseJSON = JSON.parse(responseBody); ",
+                  "    tests['response is valid JSON'] = true;",
+                  "}",
+                  "catch (e) { ",
+                  "    responseJSON = {}; ",
+                  "    tests['response is valid JSON'] = false;",
+                  "}",
+                  "",
+                  "tests['response json contains headers'] = _.has(responseJSON, 'headers');",
+                  "tests['response json contains args'] = _.has(responseJSON, 'args');",
+                  "tests['response json contains url'] = _.has(responseJSON, 'url');",
+                  "",
+                  "tests['args key contains argument passed as url parameter'] = ('test' in responseJSON.args);",
+                  "tests['args passed via request url params has value \"123\"'] = (_.get(responseJSON, 'args.test') === \"123\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{URL}}/get?test=123",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "get"
+              ],
+              "query": [
+                {
+                  "key": "test",
+                  "value": "123"
+                }
+              ]
+            },
+            "description": "The HTTP `GET` request method is meant to retrieve data from a server. The data\nis identified by a unique URI (Uniform Resource Identifier). \n\nA `GET` request can pass parameters to the server using \"Query String \nParameters\". For example, in the following request,\n\n> http://example.com/hi/there?hand=wave\n\nThe parameter \"hand\" has the value \"wave\".\n\nThis endpoint echoes the HTTP headers, request parameters and the complete\nURI requested."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON;",
+                  "",
+                  "try { ",
+                  "    responseJSON = JSON.parse(responseBody); ",
+                  "    tests['response is valid JSON'] = true;",
+                  "}",
+                  "catch (e) { ",
+                  "    responseJSON = {}; ",
+                  "    tests['response is valid JSON'] = false;",
+                  "}",
+                  "",
+                  "",
+                  "tests['response has PUT data'] = _.has(responseJSON, 'data');",
+                  "tests['response matches the data sent in request'] = (responseJSON.data && responseJSON.data.length === 256);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Etiam mi lacus, cursus vitae felis et, blandit pellentesque neque. Vestibulum eget nisi a tortor commodo dignissim.\nQuisque ipsum ligula, faucibus a felis a, commodo elementum nisl. Mauris vulputate sapien et tincidunt viverra. Donec vitae velit nec metus."
+            },
+            "url": {
+              "raw": "{{URL}}/put",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "put"
+              ]
+            },
+            "description": "The HTTP `PUT` request method is similar to HTTP `POST`. It too is meant to \ntransfer data to a server (and elicit a response). What data is returned depends on the implementation\nof the server.\n\nA `PUT` request can pass parameters to the server using \"Query String \nParameters\", as well as the Request Body. For example, in the following \nraw HTTP request,\n\n> PUT /hi/there?hand=wave\n>\n> <request-body>\n\n\n"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON;",
+                  "",
+                  "try { ",
+                  "    responseJSON = JSON.parse(responseBody); ",
+                  "    tests['response is valid JSON'] = true;",
+                  "}",
+                  "catch (e) { ",
+                  "    responseJSON = {}; ",
+                  "    tests['response is valid JSON'] = false;",
+                  "}",
+                  "",
+                  "",
+                  "tests['response has PUT data'] = _.has(responseJSON, 'data');",
+                  "tests['response matches the data sent in request'] = (responseJSON.data && responseJSON.data.length === 256);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Curabitur auctor, elit nec pulvinar porttitor, ex augue condimentum enim, eget suscipit urna felis quis neque.\nSuspendisse sit amet luctus massa, nec venenatis mi. Suspendisse tincidunt massa at nibh efficitur fringilla. Nam quis congue mi. Etiam volutpat."
+            },
+            "url": {
+              "raw": "{{URL}}/patch",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "patch"
+              ]
+            },
+            "description": "The HTTP `PATCH` method is used to update resources on a server. The exact\nuse of `PATCH` requests depends on the server in question. There are a number\nof server implementations which handle `PATCH` differently. Technically, \n`PATCH` supports both Query String parameters and a Request Body.\n\nThis endpoint accepts an HTTP `PATCH` request and provides debug information\nsuch as the HTTP headers, Query String arguments, and the Request Body."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJSON;",
+                  "",
+                  "try { ",
+                  "    responseJSON = JSON.parse(responseBody); ",
+                  "    tests['response is valid JSON'] = true;",
+                  "}",
+                  "catch (e) { ",
+                  "    responseJSON = {}; ",
+                  "    tests['response is valid JSON'] = false;",
+                  "}",
+                  "",
+                  "",
+                  "tests['response has PUT data'] = _.has(responseJSON, 'data');",
+                  "tests['response matches the data sent in request'] = (responseJSON.data && responseJSON.data.length === 256);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Donec fermentum, nisi sed cursus eleifend, nulla tortor ultricies tellus, ut vehicula orci arcu ut velit. In volutpat egestas dapibus.\nMorbi condimentum vestibulum sapien. Etiam dignissim diam quis eros lobortis gravida vel lobortis est. Etiam gravida sed."
+            },
+            "url": {
+              "raw": "{{URL}}/delete",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "delete"
+              ]
+            },
+            "description": "The HTTP `DELETE` method is used to delete resources on a server. The exact\nuse of `DELETE` requests depends on the server implementation. In general, \n`DELETE` requests support both, Query String parameters as well as a Request \nBody.\n\nThis endpoint accepts an HTTP `DELETE` request and provides debug information\nsuch as the HTTP headers, Query String arguments, and the Request Body."
+          },
+          "response": []
+        }
+      ],
+      "description": "HTTP has multiple request \"verbs\", such as `GET`, `PUT`, `POST`, `DELETE`,\n`PATCH`, `HEAD`, etc. \n\nAn HTTP Method (verb) defines how a request should be interpreted by a server. \nThe endpoints in this section demonstrate various HTTP Verbs. Postman supports \nall the HTTP Verbs, including some rarely used ones, such as `PROPFIND`, `UNLINK`, \netc.\n\nFor details about HTTP Verbs, refer to [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9)\n"
+    },
+    {
+      "name": "Request method Collections",
+      "item": [
+        {
+          "name": "Create Collection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"response is ok\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"response json data should not have errors\", function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    pm.response.to.not.have.jsonBody('error');",
+                  "});",
+                  "",
+                  "// --- Body contract (JSON Schema) ---",
+                  "const schema = {",
+                  "    type: \"object\",",
+                  "    required: [\"collection\"],",
+                  "    additionalProperties: true,",
+                  "    properties: {",
+                  "        collection: {",
+                  "            type: \"object\",",
+                  "            required: [\"id\", \"name\", \"uid\"],",
+                  "            additionalProperties: true,",
+                  "            properties: {",
+                  "                id: { type: \"string\", minLength: 1 },",
+                  "                name: { type: \"string\", minLength: 1 },",
+                  "                uid: { type: \"string\", minLength: 1 }",
+                  "            }",
+                  "        }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test(\"response json should contain one collection\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('collection').and.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"response json should return collection details\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(pm.response.json()).to.have.property('collection')",
+                  "        .and.to.include.keys(['id', 'name', 'uid']);",
+                  "    pm.globals.set(\"Id\", jsonData['collection'].id);",
+                  "});",
+                  "",
+                  "pm.test(\"Contract: collection.id looks like a UUID\", () => {",
+                  "    const { collection } = pm.response.json();",
+                  "    pm.expect(collection.id).to.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/);",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"collection\": {\n        \"info\": {\n            \"name\": \"Sample Collection 909\",\n            \"description\": \"This is just a sample collection.\",\n            \"schema\": \"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\"\n        },\n        \"item\": [\n            {\n                \"name\": \"This is a folder\",\n                \"item\": [\n                    {\n                        \"name\": \"Sample POST Request\",\n                        \"request\": {\n                            \"url\": \"https://postman-echo.com/post\",\n                            \"method\": \"POST\",\n                            \"header\": [\n                                {\n                                    \"key\": \"Content-Type\",\n                                    \"value\": \"application/json\"\n                                }\n                            ],\n                            \"body\": {\n                                \"mode\": \"raw\",\n                                \"raw\": \"{\\\"data\\\": \\\"123\\\"}\"\n                            },\n                            \"description\": \"This is a sample POST Request\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"Sample GET Request\",\n                \"request\": {\n                    \"url\": \"https://postman-echo/get\",\n                    \"method\": \"GET\",\n                    \"description\": \"This is a sample GET Request\"\n                }\n            }\n        ]\n    }\n}"
+            },
+            "url": {
+              "raw": "{{URLCOLL}}",
+              "host": [
+                "{{URLCOLL}}"
+              ]
+            },
+            "description": "This endpoint allows you to create collections using the Postman Collection v2 format. For more information about the v2 schema, check the format [here](https://schema.getpostman.com/json/collection/v2.0.0/docs/index.html).\n\nOn successful creation of the collection, the response returns the collection `name`, `id` and the `uid`.\n\nYou can also specify the context of a workspace to create a collection in directly by passing the `workspace` as a query param.\n\n> Requires <a href=\"#authentication\">API Key</a> as `X-Api-Key` request header or `apikey` URL query parameter."
+          },
+          "response": []
+        },
+        {
+          "name": "Single Collection ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"response is ok\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"response json data should not have errors\", function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    pm.response.to.not.have.jsonBody('error');",
+                  "});",
+                  "",
+                  "pm.test(\"response json should contain one collection\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('collection').and.be.an('object');",
+                  "});",
+                  "",
+                  "// additional tests to ensure that the relevant environment variables are present",
+                  "pm.test('\"postman_api_key\" variable should be present', function () {",
+                  "    pm.expect(pm.variables.get('postman_api_key')).to.be.a('string');",
+                  "});",
+                  "",
+                  "// you can unskip this test in case you want to have a stricter check on the selected",
+                  "// environment.",
+                  "pm.test.skip('\"collection_uid\" variable should be present', function () {",
+                  "    pm.expect(pm.variables.get('collection_uid')).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URLCOLL}}/{{Id}}",
+              "host": [
+                "{{URLCOLL}}"
+              ],
+              "path": [
+                "{{Id}}"
+              ]
+            },
+            "description": "Access the contents of a collection that is accessible to you using its unique id (`uid`).\n\n> Requires <a href=\"#authentication\">API Key</a> as `X-Api-Key` request header or `apikey` URL query parameter."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Collection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"response is ok\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"response json data should not have errors\", function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    pm.response.to.not.have.jsonBody('error');",
+                  "});",
+                  "",
+                  "pm.test(\"response json should contain one collection\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('collection').and.be.an('object');",
+                  "});",
+                  "",
+                  "// additional tests to ensure that the relevant environment variables are present",
+                  "pm.test('\"postman_api_key\" variable should be present', function () {",
+                  "    pm.expect(pm.variables.get('postman_api_key')).to.be.a('string');",
+                  "});",
+                  "",
+                  "// we double check the request to ensure that relevant parameters are present",
+                  "pm.test(\"request body must have valid json\", function () {",
+                  "    var _ = require('lodash'),",
+                  "        requestJSON = JSON.parse(_.get(pm.request, 'body.raw', '{}')),",
+                  "        collectionIdInRequestUrl = _.get(pm.request, 'url.path[1]', '').replace(/^.*?-/, '');",
+                  "",
+                  "    // the request body collection should have the same collection Id as sent in URL",
+                  "    pm.expect(requestJSON).to.have.nested.property('collection.info._postman_id', ",
+                  "        collectionIdInRequestUrl);",
+                  "});",
+                  "",
+                  "// you can unskip this test in case you want to have a stricter check on the selected",
+                  "// environment.",
+                  "pm.test.skip('\"collection_uid\" variable should be present', function () {",
+                  "    pm.expect(pm.variables.get('collection_uid')).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"collection\": {\n        \"info\": {\n            \"name\": \"Sample Collection 530\",\n            \"description\": \"This is just a sample collection.\",\n            \"_postman_id\": \"174bad7c-07e3-45f3-914f-36cf84e5586f\",\n            \"schema\": \"https://schema.getpostman.com/json/collection/v2.1.0/collection.json\"\n        },\n        \"item\": [\n            {\n                \"name\": \"This is a folder\",\n                \"item\": [\n                    {\n                        \"name\": \"Sample POST Request\",\n                        \"request\": {\n                            \"url\": \"https://postman-echo.com/post\",\n                            \"method\": \"POST\",\n                            \"header\": [\n                                {\n                                    \"key\": \"Content-Type\",\n                                    \"value\": \"application/json\"\n                                }\n                            ],\n                            \"body\": {\n                                \"mode\": \"raw\",\n                                \"raw\": \"{\\\"data\\\": \\\"123\\\"}\"\n                            },\n                            \"description\": \"This is a sample POST Request\"\n                        }\n                    }\n                ]\n            },\n            {\n                \"name\": \"Sample GET Request\",\n                \"request\": {\n                    \"url\": \"https://postman-echo/get\",\n                    \"method\": \"GET\",\n                    \"description\": \"This is a sample GET Request\"\n                }\n            }\n        ]\n    }\n}"
+            },
+            "url": {
+              "raw": "{{URLCOLL}}/{{Id}}",
+              "host": [
+                "{{URLCOLL}}"
+              ],
+              "path": [
+                "{{Id}}"
+              ]
+            },
+            "description": "This endpoint allows you to update an existing collection using the Postman Collection v2 format. For more information about the v2 schema, check the format [here](https://schema.getpostman.com/json/collection/v2.0.0/docs/index.html).\n\nOn successful updation of the collection, the response returns the collection `name`, `id` and `uid`.\n\n> Requires <a href=\"#authentication\">API Key</a> as `X-Api-Key` request header or `apikey` URL query parameter.\n\nNote: Please be careful when trying to update the collection, as the existing collection will be replaced by the request body."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Collection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"response is ok\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"response json data should not have errors\", function () {",
+                  "    pm.response.to.have.jsonBody();",
+                  "    pm.response.to.not.have.jsonBody('error');",
+                  "});",
+                  "",
+                  "pm.test(\"response json should contain one collection\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('collection').and.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test(\"response json should return collection details\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('collection')",
+                  "        .and.to.include.keys(['id', 'uid']);",
+                  "});",
+                  "",
+                  "// additional tests to ensure that the relevant environment variables are present",
+                  "pm.test('\"postman_api_key\" variable should be present', function () {",
+                  "    pm.expect(pm.variables.get('postman_api_key')).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{URLCOLL}}/{{Id}}",
+              "host": [
+                "{{URLCOLL}}"
+              ],
+              "path": [
+                "{{Id}}"
+              ]
+            },
+            "description": "This endpoint allows you to delete an existing collection.\n\nOn successful deletion of the collection, the response returns the `id` and `uid`.\n\n> Requires <a href=\"#authentication\">API Key</a> as `X-Api-Key` request header or `apikey` URL query parameter."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{postman-api-key}}",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
